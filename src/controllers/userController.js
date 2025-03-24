@@ -44,9 +44,29 @@ export const createUser = async (req, res, next) => {
 }
 
 export const editUser = async (req, res, next) => {
-  next();
+  try {
+    const user = await User.findOneAndUpdate(req.params, req.body, { new: true });
+
+    res
+      .status(httpStatus.OK)
+      .json(user);
+  } catch (err) {
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: err.message });
+  }
 }
 
 export const deleteUser = async (req, res, next) => {
-  next();
+  try {
+    await User.findByIdAndDelete(req.params._id);
+
+    res
+      .status(httpStatus.OK)
+      .send();
+  } catch (err) {
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: err.message });
+  }
 }
