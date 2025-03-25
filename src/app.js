@@ -5,6 +5,7 @@ import helmet from "helmet";
 import cors from "cors";
 import dotenv from "dotenv";
 
+import handlers from "./middlewares/handlers.js";
 import hateos from "./middlewares/hateos.js";
 import database from "./config/database.js";
 import routes from "./routes.js";
@@ -20,6 +21,7 @@ app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
+app.use(handlers);
 app.use(hateos);
 app.use(routes);
 
