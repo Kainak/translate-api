@@ -7,7 +7,15 @@ export const showUser = async (req, res, next) => {
 
     res
       .status(httpStatus.OK)
-      .json(user);
+      .json({
+        ...user._doc,
+        _links: [
+          { rel: "self", href: req.originalUrl, method: req.method, },
+          { rel: "list", href: req.baseUrl, method: "GET", },
+          { rel: "update", href: `${req.baseUrl}/${req.params._id}`, method: "PUT", },
+          { rel: "delete", href: `${req.baseUrl}/${req.params._id}`, method: "DELETE", },
+        ],
+      });
   } catch (err) {
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
@@ -21,7 +29,18 @@ export const listUsers = async (req, res, next) => {
 
     res
       .status(httpStatus.OK)
-      .json(users);
+      .json({
+        users: users.map((user) => ({
+          ...user._doc,
+          _links: [
+            { rel: "self", href: `${req.baseUrl}/${user._id}`, method: "GET", },
+          ]
+        })),
+        _links: [
+          { rel: "self", href: req.baseUrl, method: req.method, },
+          { rel: "create", href: req.baseUrl, method: "POST", },
+        ],
+      });
   } catch (err) {
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
@@ -49,7 +68,15 @@ export const editUser = async (req, res, next) => {
 
     res
       .status(httpStatus.OK)
-      .json(user);
+      .json({
+        ...user._doc,
+        _links: [
+          { rel: "self", href: req.originalUrl, method: req.method, },
+          { rel: "list", href: req.baseUrl, method: "GET", },
+          { rel: "update", href: `${req.baseUrl}/${req.params._id}`, method: "PUT", },
+          { rel: "delete", href: `${req.baseUrl}/${req.params._id}`, method: "DELETE", },
+        ],
+      });
   } catch (err) {
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
