@@ -9,6 +9,7 @@ export const showUser = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+}
 
 export const listUsers = async (req, res, next) => {
   try {
