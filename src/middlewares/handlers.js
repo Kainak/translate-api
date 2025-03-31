@@ -19,5 +19,23 @@ export default (req, res, next) => {
       .send();
   }
 
+  res.internal_server_error = (err) => {
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json(err);
+  }
+
+  res.not_found = () => {
+    res
+      .status(httpStatus.NOT_FOUND)
+      .send("not found...");
+  }
+
+  res.payment_required = (err) => {
+    res
+      .status(httpStatus.PAYMENT_REQUIRED)
+      .json(err);
+  }
+
   next();
 }

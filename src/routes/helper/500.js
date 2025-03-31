@@ -1,5 +1,3 @@
-import httpStatus from "http-status";
-
 export default (err, req, res, next) => {
   const { code, message } = err;
 
@@ -7,10 +5,8 @@ export default (err, req, res, next) => {
     console.error(message);
   }
 
-  res
-    .status(httpStatus.INTERNAL_SERVER_ERROR)
-    .json({
-      code,
-      message,
-    });
+  res.internal_server_error({
+    code,
+    message,
+  });
 };

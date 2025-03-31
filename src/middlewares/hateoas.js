@@ -1,5 +1,5 @@
 export default (req, res, next) => {
-  res.hateos_item = (data) => {
+  res.hateoas_item = (data) => {
     res.ok({
       ...data._doc,
       _links: [
@@ -11,7 +11,7 @@ export default (req, res, next) => {
     });
   }
 
-  res.hateos_list = (data) => {
+  res.hateoas_list = (data) => {
     res.ok({
       data: data.map((item) => ({
         ...item._doc,
