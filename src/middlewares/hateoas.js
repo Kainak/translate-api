@@ -11,7 +11,10 @@ export default (req, res, next) => {
     });
   }
 
-  res.hateoas_list = (data) => {
+  res.hateoas_list = (data, totalPages) => {
+    const page = parseInt(req.query._page) || 1;
+    const size = parseInt(req.query._size) || 10;
+
     res.ok({
       data: data.map((item) => ({
         ...item._doc,
@@ -19,9 +22,16 @@ export default (req, res, next) => {
           { rel: "self", href: `${req.baseUrl}/${item._id}`, method: "GET", },
         ]
       })),
+      _page: {
+        current: page,
+        total: totalPages,
+        size: data.length,
+      },
       _links: [
         { rel: "self", href: req.baseUrl, method: req.method, },
         { rel: "create", href: req.baseUrl, method: "POST", },
+        { rel: "previous", href: page > 1 ? `${req.baseUrl}?_page=${page - 1}&_size=${size}`: null, method: req.method, },
+        { rel: "next", href: page < totalPages ? `${req.baseUrl}?_page=${page + 1}&_size=${size}` : null, method: req.method, },
       ],
     });
   }

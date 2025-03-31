@@ -12,9 +12,22 @@ export const showUser = async (req, res, next) => {
 
 export const listUsers = async (req, res, next) => {
   try {
-    const users = await User.find({});
+    const { _page, _size, _order, ...filter } = req.query;
+    const page = parseInt(_page) || 1;
+    const size = parseInt(_size) || 10;
 
-    res.hateoas_list(users);
+    const offset = (page - 1) * size;
+
+    const users = await User
+      .find(filter)
+      .skip(offset)
+      .limit(size)
+      .sort(_order);
+
+    const totalData = await User.countDocuments();
+    const totalPages = Math.ceil(totalData / size);
+
+    res.hateoas_list(users, totalPages);
   } catch (err) {
     next(err);
   }
