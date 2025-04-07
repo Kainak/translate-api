@@ -1,4 +1,7 @@
 export default (req, res, next) => {
+  /*
+  #swagger.ignore = true
+  */
   if (!!req.query._order) {
     const [field, direction] = req.query._order.split(" ");
 
