@@ -11,6 +11,54 @@
     }
   ],
   "paths": {
+    "/login/": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "example": "any"
+                  },
+                  "password": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/users/": {
       "get": {
         "tags": [
@@ -66,7 +114,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": {}
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -93,6 +146,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearerAuth": {}
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -145,7 +203,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": {}
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -182,6 +245,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearerAuth": {}
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -232,7 +300,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": {}
+          }
+        ]
       }
     }
   },
@@ -273,6 +346,12 @@
         "xml": {
           "name": "User"
         }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
       }
     }
   }

@@ -23,6 +23,12 @@ const doc = {
         password: "",
       },
     },
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer"
+      }
+    }
   },
 };
 
