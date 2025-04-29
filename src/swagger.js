@@ -22,6 +22,9 @@ const doc = {
         email: "",
         password: "",
       },
+      Task: {
+        description: "",
+      },
     },
     securitySchemes: {
       bearerAuth: {
