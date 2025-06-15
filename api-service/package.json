@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start:api": "node api/server.js",
-    "start:api:watch": "node --watch api/server.js",
-    "start:worker": "node translation-worker/worker.js",
-    "start:worker:watch": "node --watch translation-worker/worker.js",
-    "swagger:gen": "node api/swagger.js",
-    "swagger:watch": "node --watch api/swagger.js"
+    "start": "node src/server",
+    "start:watch": "node --watch src/server",
+    "swagger": "node src/swagger",
+    "swagger:watch": "node --watch src/swagger",
+    "dev": "nodemon src/server"
   },
   "dependencies": {
     "amqplib": "~0.10.7",
@@ -19,8 +18,9 @@
     "helmet": "8.0.0",
     "http-status": "2.1.0",
     "jsonwebtoken": "9.0.2",
-    "mongoose": "8.10.1",
+    "mongoose": "^8.10.1",
     "morgan": "1.10.0",
+    "nodemon": "^3.1.10",
     "swagger-ui-express": "5.0.1",
     "uuid": "~11.1.0",
     "yup": "1.6.1"

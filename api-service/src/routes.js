@@ -9,7 +9,6 @@ import NotFound from "./routes/helper/404.js";
 
 import AuthRouter from "./routes/authRouter.js";
 import UserRouter from "./routes/userRouter.js";
-import TaskRouter from "./routes/taskRoute.js";
 
 import { verify } from "./controllers/authController.js";
 
@@ -18,9 +17,10 @@ routes.use(order);
 routes.use(hateoas);
 routes.use(handler);
 
-routes.use("/login", AuthRouter);
-routes.use("/api/users", verify, UserRouter);
-routes.use("/api/tasks", TaskRouter);
+// routes.use("/login", AuthRouter);
+// routes.use("/api/users", verify, UserRouter);
+
+
 
 routes.use(InternalServerError);
 routes.use(NotFound);
