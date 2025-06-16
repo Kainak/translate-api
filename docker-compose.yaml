@@ -12,8 +12,8 @@ services:
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq
     ports:
-      - "5672:5672" # for amqp
-      - "15672:15672" # for management ui
+      - "5672:5672"
+      - "15672:15672"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 10s
@@ -22,15 +22,15 @@ services:
     restart: unless-stopped
 
   api:
+    container_name: api
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: translation-api
-    command: npm run start:api:watch
     ports:
       - "4040:4040"
     volumes:
       - ./api:/usr/src/app/api
+      - /usr/src/app/api/config
       - ./translation-worker:/usr/src/app/translation-worker
       - /usr/src/app/node_modules
     depends_on:
@@ -39,12 +39,9 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
-      - DATABASE=mongodb://mongodb:27017/translations
-      - RABBITMQ=amqp://rabbitmq:5672
-      - PORT=4040
-      - JWTSECRET=your-super-secret-key
-      - JWTEXPIRE=1h
-      - SERVER=http://localhost:4040
+      - DATABASE=${DATABASE}
+      - RABBITMQ=${RABBITMQ}
+      - PORT=${PORT}
     restart: unless-stopped
 
   worker:
@@ -63,8 +60,8 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
-      - DATABASE=mongodb://mongodb:27017/translations
-      - RABBITMQ=amqp://rabbitmq:5672
+      - DATABASE=${DATABASE}
+      - RABBITMQ=${RABBITMQ}
     restart: unless-stopped
 
 volumes:

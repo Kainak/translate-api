@@ -1,41 +1,80 @@
-import swaggerAutogen from "swagger-autogen";
+import swaggerAutogen from 'swagger-autogen';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const doc = {
   info: {
-    version: "1.0.0",
-    title: "Tecnologias Emergentes",
-    description: "Documentação da API criada em sala",
+    title: 'Translation API',
+    description: 'API for translating text.',
   },
-  servers: [
-    {
-      url: "http://localhost:4040/"
-    }
-  ],
+  host: 'localhost:3000',
+  schemes: ['http'],
+  basePath: '/translations',
   components: {
     schemas: {
-      InternalServerError: {
-        code: "",
-        message: "",
+      CreateTranslationRequest: {
+        type: 'object',
+        properties: {
+          text: {
+            type: 'string',
+            example: 'Hello, world!',
+          },
+          targetLanguage: {
+            type: 'string',
+            example: 'pt',
+          },
+        },
+        required: ['text', 'targetLanguage'],
       },
-      User: {
-        name: "",
-        email: "",
-        password: "",
+      CreateTranslationResponse: {
+        type: 'object',
+        properties: {
+          message: {
+            type: 'string',
+            example: 'Request received and is being processed.',
+          },
+          requestId: {
+            type: 'string',
+            example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
+          },
+        },
       },
-      Task: {
-        description: "",
+      GetTranslationStatusResponse: {
+        type: 'object',
+        properties: {
+          status: {
+            type: 'string',
+            example: 'completed',
+          },
+          originalText: {
+            type: 'string',
+            example: 'Hello, world!',
+          },
+          translatedText: {
+            type: 'string',
+            example: 'Olá, Mundo!',
+          },
+        },
+      },
+      ErrorResponse: {
+        type: 'object',
+        properties: {
+          message: {
+            type: 'string',
+            example: 'An error occurred.',
+          },
+        },
       },
     },
-    securitySchemes: {
-      bearerAuth: {
-        type: "http",
-        scheme: "bearer"
-      }
-    }
   },
 };
 
-const outputFile = "./api/config/swagger.json";
-const endpointsFiles = ["./api/routes.js"];
+const outputFile = path.join(__dirname, '..', 'swagger-output.json');
+const endpointsFiles = [path.join(__dirname, 'routes', 'translationRouter.js')];
 
-swaggerAutogen({ openapi: "3.0.0" })(outputFile, endpointsFiles, doc);
+swaggerAutogen({ openapi: '3.0.0' })(outputFile, endpointsFiles, doc).then(() => {
+  console.log('Swagger documentation generated successfully.');
+});

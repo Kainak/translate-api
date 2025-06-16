@@ -37,7 +37,7 @@ class TranslationConsumer {
 
       // Simulate translation work (e.g., reverse the string)
       const translatedText = text.split('').reverse().join('');
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate delay
+      await new Promise(resolve => setTimeout(resolve, 20000)); // Simulate delay
 
       // Update status to 'completed'
       await Translation.updateOne(

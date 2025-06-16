@@ -1,32 +1,123 @@
-# Tecnologias Emergentes - Template 01
+# 翻訳 API (API de Tradução)
 
-Este projeto tem como objetivo proporcionar um ambiente prático para o desenvolvimento e treinamento na criação de APIs utilizando **Node.js** e **Express**. Com a crescente demanda por aplicações baseadas em arquitetura de micro-serviços e integrações via APIs.
+Este projeto implementa uma API de tradução de textos construída com Node.js. A arquitetura utiliza um worker assíncrono para processar as traduções, garantindo que a API permaneça responsiva e desacoplada da lógica de processamento.
 
-## Requisitos
+A comunicação entre a API e o worker é gerenciada por uma fila de mensagens com RabbitMQ, e os resultados são persistidos em um banco de dados MongoDB.
 
-- [Node.js](https://nodejs.org/)
-- [Postman](https://www.postman.com/)
-- [VsCode](https://code.visualstudio.com/)
+## ✨ Funcionalidades
 
-## Banco de Dados
+-   **API REST**: Interface para submeter textos para tradução e consultar o status.
+-   **Processamento Assíncrono**: As traduções são processadas em segundo plano por um worker dedicado.
+-   **Fila de Mensagens**: RabbitMQ para uma comunicação robusta e escalável entre os serviços.
+-   **Persistência de Dados**: MongoDB para armazenar as solicitações e seus resultados.
+-   **Ambiente Containerizado**: Docker e Docker Compose para orquestrar os serviços (API, worker, RabbitMQ, MongoDB).
 
-Para este projeto, vamos utilizar o **MongoDb** que é um banco de dados não relacional. Um banco de dados não relacional, é um tipo de banco de dados projetado para armazenar e gerenciar grandes volumes de dados de maneira flexível, sem a necessidade de um esquema rígido como nos bancos relacionais tradicionais.
+## 🚀 Tecnologias Utilizadas
 
-- [Atlas](https://account.mongodb.com/)
+-   **Backend**: Node.js, Express.js
+-   **Banco de Dados**: MongoDB com Mongoose
+-   **Fila de Mensagens**: RabbitMQ com amqplib
+-   **Containerização**: Docker
+-   **Validação**: Yup
 
-## Rodar o Projeto
+## 📂 Estrutura do Projeto
 
-Primeiramente devemos criar um arquivo de variáveis de ambiente que vamos rodar localmente, para isso na raiz do projeto crie um arquivo `.env` seguindo o modelo `.env.example` disponível no projeto.
-
-Após isso as dependências podem ser instaladas com o comando abaixo
-
-```bash
-$ npm install
+```
+.
+├── api/                # Contém o código da API (Express)
+│   ├── controllers/
+│   ├── routes/
+│   ├── app.js
+│   └── server.js
+├── translation-worker/ # Contém o código do worker assíncrono
+│   └── worker.js
+├── .env.example        # Arquivo de exemplo para variáveis de ambiente
+├── docker-compose.yaml # Orquestração dos containers
+├── Dockerfile          # Definição do container da aplicação
+└── package.json        # Dependências e scripts do projeto
 ```
 
-Para executar o projeto pode ser executado os comandos
+## ⚙️ Pré-requisitos
 
-```bash
-$ npm start
-$ npm run start:watch
+-   [Node.js](https://nodejs.org/) (v18 ou superior)
+-   [Docker](https://www.docker.com/get-started/) e [Docker Compose](https://docs.docker.com/compose/install/)
+
+## 🏁 Como Começar
+
+1.  **Clone o repositório:**
+    ```bash
+    git clone https://github.com/seu-usuario/seu-repositorio.git
+    cd seu-repositorio
+    ```
+
+2.  **Configure as Variáveis de Ambiente:**
+    Crie um arquivo `.env` na raiz do projeto, copiando o `.env.example`. Preencha as variáveis, especialmente a sua connection string do MongoDB Atlas.
+    ```bash
+    cp .env.example .env
+    ```
+
+3.  **Instale as dependências:**
+    ```bash
+    npm install
+    ```
+
+4.  **Inicie os serviços com Docker Compose:**
+    Este comando irá construir as imagens e iniciar os containers da API, do worker, do RabbitMQ e do MongoDB.
+    ```bash
+    docker-compose up -d --build
+    ```
+
+## 📜 Scripts NPM
+
+-   `npm run start:api`: Inicia o servidor da API.
+-   `npm run start:worker`: Inicia o worker de tradução.
+-   `npm run start:api:watch`: Inicia a API em modo de desenvolvimento (reinicia ao salvar).
+-   `npm run start:worker:watch`: Inicia o worker em modo de desenvolvimento.
+-   `npm run swagger:gen`: Gera (ou atualiza) a documentação da API com base nos comentários das rotas.
+
+## Endpoints da API
+
+O prefixo base para todos os endpoints é `/translations`.
+
+### `POST /`
+
+Cria uma nova solicitação de tradução.
+
+**Request Body:**
+
+```json
+{
+  "text": "Hello, world!",
+  "targetLanguage": "pt"
+}
 ```
+
+**Success Response (202 Accepted):**
+
+```json
+{
+  "message": "Request received and is being processed.",
+  "requestId": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+}
+```
+
+### `GET /:requestId`
+
+Verifica o status e o resultado de uma tradução.
+
+**URL Params:**
+
+-   `requestId` (string, required): O ID da solicitação retornado no endpoint de criação.
+
+**Success Response (200 OK):**
+
+```json
+{
+  "status": "completed",
+  "originalText": "Hello, world!",
+  "translatedText": "Olá, Mundo!"
+}
+```
+
+
+
