@@ -5,7 +5,6 @@ import translationRouter from './routes/translationRouter.js';
 const routes = Router();
 
 routes.get('/', (req, res) => {
-  // #swagger.ignore = true
   res.send('OK');
 });
 

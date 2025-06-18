@@ -1,3 +1,4 @@
+import { translate } from '@vitalets/google-translate-api';
 import amqp from 'amqplib';
 import Translation from '../api/models/translationModel.js';
 
@@ -6,7 +7,6 @@ const TRANSLATION_QUEUE = 'translation_queue';
 class TranslationConsumer {
   constructor() {
     this.connection = null;
-    this.channel = null;
   }
 
   async start() {
@@ -14,7 +14,7 @@ class TranslationConsumer {
       this.connection = await amqp.connect(process.env.RABBITMQ);
       this.channel = await this.connection.createChannel();
       await this.channel.assertQueue(TRANSLATION_QUEUE, { durable: true });
-      this.channel.prefetch(1); // Process one message at a time
+      this.channel.prefetch(1); 
       console.log('RabbitMQ consumer connected and waiting for messages.');
 
       this.channel.consume(TRANSLATION_QUEUE, (msg) => this.processMessage(msg), { noAck: false });
@@ -29,16 +29,17 @@ class TranslationConsumer {
     let data;
     try {
       data = JSON.parse(msg.content.toString());
-      const { requestId, text } = data;
+      const { requestId, text, to } = data;
       console.log(`Received translation request: ${requestId}`);
+      console.log(`Received translation request: ${text}`);
+      console.log(`Received translation request: ${to}`);
 
       // Update status to 'processing'
       await Translation.updateOne({ requestId }, { $set: { status: 'processing' } });
 
-      // Simulate translation work (e.g., reverse the string)
-      const translatedText = text.split('').reverse().join('');
-      await new Promise(resolve => setTimeout(resolve, 20000)); // Simulate delay
-
+      const { text: translatedText } = await translate(text, { to });
+      console.log(`Translated text: ${translatedText}`);
+      await new Promise(resolve => setTimeout(resolve, 15000));
       // Update status to 'completed'
       await Translation.updateOne(
         { requestId },

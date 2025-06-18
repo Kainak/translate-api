@@ -32,7 +32,6 @@ services:
       - ./api:/usr/src/app/api
       - /usr/src/app/api/config
       - ./translation-worker:/usr/src/app/translation-worker
-      - /usr/src/app/node_modules
     depends_on:
       mongodb:
         condition: service_started
@@ -53,7 +52,6 @@ services:
     volumes:
       - ./api:/usr/src/app/api
       - ./translation-worker:/usr/src/app/translation-worker
-      - /usr/src/app/node_modules
     depends_on:
       mongodb:
         condition: service_started

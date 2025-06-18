@@ -2,6 +2,7 @@ import 'dotenv/config';
 import database from '../api/config/database.js';
 import TranslationConsumer from './consumer.js';
 
+
 const startWorker = async () => {
   try {
     console.log('Starting translation worker...');

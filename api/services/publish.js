@@ -19,7 +19,6 @@ class Publisher {
       console.log('RabbitMQ publisher connected');
     } catch (err) {
       console.error('Failed to connect to RabbitMQ publisher', err);
-      // Optional: Add retry logic here
     }
   }
 

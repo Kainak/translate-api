@@ -15,8 +15,14 @@ database.config(process.env.DATABASE);
 
 const app = express();
 
-app.use(cors());
-app.use(helmet());
+app.use(cors({origin: "*"}));
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+        }
+    }
+}));
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

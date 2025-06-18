@@ -1,48 +1,48 @@
-# 翻訳 API (API de Tradução)
+# API de Tradução Assíncrona
 
-Este projeto implementa uma API de tradução de textos construída com Node.js. A arquitetura utiliza um worker assíncrono para processar as traduções, garantindo que a API permaneça responsiva e desacoplada da lógica de processamento.
+Este projeto implementa uma API de tradução de textos que funciona de forma assíncrona, utilizando uma arquitetura baseada em microserviços com workers para processamento em segundo plano.
 
-A comunicação entre a API e o worker é gerenciada por uma fila de mensagens com RabbitMQ, e os resultados são persistidos em um banco de dados MongoDB.
+[![Node.js](https://img.shields.io/badge/Node.js-18-blue?logo=nodedotjs)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-4-green?logo=express)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-blue?logo=mongodb)](https://www.mongodb.com/)
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-orange?logo=rabbitmq)](https://www.rabbitmq.com/)
+[![Docker](https://img.shields.io/badge/Docker-blue?logo=docker)](https://www.docker.com/)
 
-## ✨ Funcionalidades
+## Arquitetura
 
--   **API REST**: Interface para submeter textos para tradução e consultar o status.
--   **Processamento Assíncrono**: As traduções são processadas em segundo plano por um worker dedicado.
--   **Fila de Mensagens**: RabbitMQ para uma comunicação robusta e escalável entre os serviços.
--   **Persistência de Dados**: MongoDB para armazenar as solicitações e seus resultados.
--   **Ambiente Containerizado**: Docker e Docker Compose para orquestrar os serviços (API, worker, RabbitMQ, MongoDB).
+O sistema é composto por quatro componentes principais que rodam em contêineres Docker:
 
-## 🚀 Tecnologias Utilizadas
+1.  **API**: Um serviço Node.js/Express responsável por receber as requisições de tradução. Ele valida os dados, cria um registro no MongoDB com o status `pending` e publica uma mensagem na fila do RabbitMQ.
+2.  **Translation Worker**: Um worker Node.js que consome as mensagens da fila. Ele processa a tradução utilizando uma API externa, atualiza o status do trabalho no MongoDB para `processing` e, ao finalizar, para `completed` ou `failed`.
+3.  **RabbitMQ**: Atua como message broker, gerenciando a fila de traduções e garantindo a comunicação desacoplada entre a API e o Worker.
+4.  **MongoDB**: Utilizado como banco de dados para persistir o estado e o resultado de cada solicitação de tradução.
+
+## Como Funciona o Fluxo de Tradução
+
+1.  O cliente envia uma requisição `POST /translations` com o texto a ser traduzido e o idioma de destino.
+2.  A API cria um novo job de tradução no MongoDB com o status `pending` e retorna imediatamente um `requestId`.
+3.  A API publica uma mensagem contendo o `requestId`, o texto e o idioma na fila do RabbitMQ.
+4.  O Worker, que está escutando a fila, consome a mensagem.
+5.  O Worker atualiza o status do job para `processing` no MongoDB.
+6.  O Worker realiza a chamada para a API de tradução externa.
+7.  Após receber o resultado, o Worker atualiza o job no MongoDB com o texto traduzido e o status `completed`. Em caso de erro, o status é `failed`.
+8.  O cliente pode usar o `requestId` para consultar o status da tradução a qualquer momento através da rota `GET /translations/:requestId`.
+
+## Tecnologias
 
 -   **Backend**: Node.js, Express.js
 -   **Banco de Dados**: MongoDB com Mongoose
--   **Fila de Mensagens**: RabbitMQ com amqplib
--   **Containerização**: Docker
--   **Validação**: Yup
+-   **Mensageria**: RabbitMQ com amqplib
+-   **Containerização**: Docker e Docker Compose
+-   **Documentação**: Swagger
+-   **Tradução**: `@vitalets/google-translate-api`
 
-## 📂 Estrutura do Projeto
+## Pré-requisitos
 
-```
-.
-├── api/                # Contém o código da API (Express)
-│   ├── controllers/
-│   ├── routes/
-│   ├── app.js
-│   └── server.js
-├── translation-worker/ # Contém o código do worker assíncrono
-│   └── worker.js
-├── .env.example        # Arquivo de exemplo para variáveis de ambiente
-├── docker-compose.yaml # Orquestração dos containers
-├── Dockerfile          # Definição do container da aplicação
-└── package.json        # Dependências e scripts do projeto
-```
+-   [Docker](https://www.docker.com/get-started)
+-   [Docker Compose](https://docs.docker.com/compose/install/)
 
-## ⚙️ Pré-requisitos
-
--   [Node.js](https://nodejs.org/) (v18 ou superior)
--   [Docker](https://www.docker.com/get-started/) e [Docker Compose](https://docs.docker.com/compose/install/)
-
-## 🏁 Como Começar
+## Como Executar o Projeto
 
 1.  **Clone o repositório:**
     ```bash
@@ -50,74 +50,75 @@ A comunicação entre a API e o worker é gerenciada por uma fila de mensagens c
     cd seu-repositorio
     ```
 
-2.  **Configure as Variáveis de Ambiente:**
-    Crie um arquivo `.env` na raiz do projeto, copiando o `.env.example`. Preencha as variáveis, especialmente a sua connection string do MongoDB Atlas.
-    ```bash
-    cp .env.example .env
+2.  **Crie o arquivo de variáveis de ambiente:**
+    Crie um arquivo chamado `.env` na raiz do projeto, copiando o conteúdo abaixo. Estes são os valores padrão para o ambiente de desenvolvimento com Docker Compose.
+
+    ```dotenv
+    # Variáveis da Aplicação
+    PORT=4040
+    # MongoDB
+    DATABASE=mongodb://mongodb:27017/translations
+    # RabbitMQ
+    RABBITMQ=amqp://rabbitmq
     ```
 
-3.  **Instale as dependências:**
+3.  **Suba os contêineres:**
+    Execute o comando abaixo para construir as imagens e iniciar todos os serviços em segundo plano.
+
     ```bash
-    npm install
+    docker-compose up --build -d
     ```
 
-4.  **Inicie os serviços com Docker Compose:**
-    Este comando irá construir as imagens e iniciar os containers da API, do worker, do RabbitMQ e do MongoDB.
-    ```bash
-    docker-compose up -d --build
-    ```
-
-## 📜 Scripts NPM
-
--   `npm run start:api`: Inicia o servidor da API.
--   `npm run start:worker`: Inicia o worker de tradução.
--   `npm run start:api:watch`: Inicia a API em modo de desenvolvimento (reinicia ao salvar).
--   `npm run start:worker:watch`: Inicia o worker em modo de desenvolvimento.
--   `npm run swagger:gen`: Gera (ou atualiza) a documentação da API com base nos comentários das rotas.
+4.  **Pronto!**
+    A API estará disponível em `http://localhost:4040`.
+    A documentação estará disponível em 'http://localhost:4040/swagger/'
 
 ## Endpoints da API
 
-O prefixo base para todos os endpoints é `/translations`.
+### `POST /translations`
 
-### `POST /`
+Inicia um novo trabalho de tradução.
 
-Cria uma nova solicitação de tradução.
+-   **Body (raw/json):**
+    ```json
+    {
+      "text": "Hello world",
+      "to": "pt"
+    }
+    ```
 
-**Request Body:**
+-   **Resposta de Sucesso (202 Accepted):**
+    A API retorna imediatamente o ID da requisição, que pode ser usado para consultar o status.
+    ```json
+    {
+      "requestId": "1b38cd7e-bf79-4372-8d41-0bc80960f3e6",
+      '"status": "queued"
+    }
+    ```
 
-```json
-{
-  "text": "Hello, world!",
-  "targetLanguage": "pt"
-}
-```
+### `GET /translations/:requestId`
 
-**Success Response (202 Accepted):**
+Verifica o status e o resultado de um trabalho de tradução.
 
-```json
-{
-  "message": "Request received and is being processed.",
-  "requestId": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
-}
-```
+-   **Parâmetros da URL:**
+    -   `requestId`: O ID retornado na criação do trabalho.
 
-### `GET /:requestId`
-
-Verifica o status e o resultado de uma tradução.
-
-**URL Params:**
-
--   `requestId` (string, required): O ID da solicitação retornado no endpoint de criação.
-
-**Success Response (200 OK):**
-
-```json
-{
-  "status": "completed",
-  "originalText": "Hello, world!",
-  "translatedText": "Olá, Mundo!"
-}
-```
-
-
-
+-   **Resposta de Sucesso (200 OK):**
+    -   **Pendente:**
+        ```json
+        {
+          "requestId": "9b36be2a-e03d-43a8-9fbe-84bf4806838e",
+          "status": "processing",
+          "createdAt": "2025-06-17T23:31:59.806Z"
+        }
+        ```
+    -   **Completo:**
+        ```json
+        {
+          "requestId": "9b36be2a-e03d-43a8-9fbe-84bf4806838e",
+          "status": "completed",
+          "createdAt": "2025-06-17T23:31:59.806Z",
+          "originalText": "Hello Word"
+          "translatedText": "Olá mundo"
+        }
+        ```

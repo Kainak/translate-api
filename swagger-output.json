@@ -7,11 +7,22 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000/translations"
+      "url": "http://127.0.0.1:4040",
+      "description": "Development server"
     }
   ],
   "paths": {
     "/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/translations/": {
       "post": {
         "description": "",
         "responses": {
@@ -38,7 +49,7 @@
         }
       }
     },
-    "/{requestId}": {
+    "/translations/{requestId}": {
       "get": {
         "description": "",
         "parameters": [
@@ -64,170 +75,56 @@
       "CreateTranslationRequest": {
         "type": "object",
         "properties": {
-          "type": {
+          "text": {
             "type": "string",
-            "example": "object"
+            "example": "Hello, world!"
           },
-          "properties": {
-            "type": "object",
-            "properties": {
-              "text": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "example": "string"
-                  },
-                  "example": {
-                    "type": "string",
-                    "example": "Hello, world!"
-                  }
-                }
-              },
-              "targetLanguage": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "example": "string"
-                  },
-                  "example": {
-                    "type": "string",
-                    "example": "pt"
-                  }
-                }
-              }
-            }
-          },
-          "required": {
-            "type": "array",
-            "example": [
-              "text",
-              "targetLanguage"
-            ],
-            "items": {
-              "type": "string"
-            }
+          "targetLanguage": {
+            "type": "string",
+            "example": "pt"
           }
-        }
+        },
+        "required": [
+          "text",
+          "to"
+        ]
       },
       "CreateTranslationResponse": {
         "type": "object",
         "properties": {
-          "type": {
+          "message": {
             "type": "string",
-            "example": "object"
+            "example": "Request received and is being processed."
           },
-          "properties": {
-            "type": "object",
-            "properties": {
-              "message": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "example": "string"
-                  },
-                  "example": {
-                    "type": "string",
-                    "example": "Request received and is being processed."
-                  }
-                }
-              },
-              "requestId": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "example": "string"
-                  },
-                  "example": {
-                    "type": "string",
-                    "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
-                  }
-                }
-              }
-            }
+          "requestId": {
+            "type": "string",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
           }
         }
       },
       "GetTranslationStatusResponse": {
         "type": "object",
         "properties": {
-          "type": {
+          "status": {
             "type": "string",
-            "example": "object"
+            "example": "completed"
           },
-          "properties": {
-            "type": "object",
-            "properties": {
-              "status": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "example": "string"
-                  },
-                  "example": {
-                    "type": "string",
-                    "example": "completed"
-                  }
-                }
-              },
-              "originalText": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "example": "string"
-                  },
-                  "example": {
-                    "type": "string",
-                    "example": "Hello, world!"
-                  }
-                }
-              },
-              "translatedText": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "example": "string"
-                  },
-                  "example": {
-                    "type": "string",
-                    "example": "Olá, Mundo!"
-                  }
-                }
-              }
-            }
+          "originalText": {
+            "type": "string",
+            "example": "Hello, world!"
+          },
+          "translatedText": {
+            "type": "string",
+            "example": "Olá, Mundo!"
           }
         }
       },
       "ErrorResponse": {
         "type": "object",
         "properties": {
-          "type": {
+          "message": {
             "type": "string",
-            "example": "object"
-          },
-          "properties": {
-            "type": "object",
-            "properties": {
-              "message": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "example": "string"
-                  },
-                  "example": {
-                    "type": "string",
-                    "example": "An error occurred."
-                  }
-                }
-              }
-            }
+            "example": "An error occurred."
           }
         }
       }
